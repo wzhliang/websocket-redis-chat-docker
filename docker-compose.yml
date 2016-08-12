@@ -2,17 +2,11 @@ version: '2'
 services:
   putter:
     build: ./putter1
-    links:
-      - redis
     environment:
       - REDIS_SRV=redis
 
   getter:
     build: ./getter
-    links:
-      - redis
-    depends_on:
-      - putter
     environment:
       - REDIS_SRV=redis
 
