@@ -25,4 +25,4 @@ RUN pip3 install autobahn redis
 
 EXPOSE 7000
 
-CMD ["/usr/bin/python3", "server.py"]
+CMD ["/usr/bin/python3", "-u", "server.py"]

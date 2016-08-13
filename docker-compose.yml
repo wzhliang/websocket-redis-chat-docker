@@ -1,6 +1,14 @@
 version: '2'
 services:
 
+  nginx:
+    build: ./lb
+    links:
+      - server1
+      - server2
+    ports:
+      - "8000:8000"
+
   server1:
     build: ./server
     links:
@@ -8,7 +16,7 @@ services:
     environment:
       - REDIS_SVR=redis
     ports:
-      - "7000:7000"
+      - "7000"
 
   server2:
     build: ./server
@@ -17,7 +25,16 @@ services:
     environment:
       - REDIS_SVR=redis
     ports:
-      - "7001"
+      - "7000"
+
+  server3:
+    build: ./server
+    links:
+      - redis
+    environment:
+      - REDIS_SVR=redis
+    ports:
+      - "7000"
 
   redis:
     image: daocloud.io/redis:latest

@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     coro = loop.create_server(factory, '0.0.0.0', 7000)
     server = loop.run_until_complete(coro)
-    print("Serving running on 7000...")
+    print("Server running on 7000...")
 
     try:
         loop.run_forever()
