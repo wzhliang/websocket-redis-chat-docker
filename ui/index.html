@@ -10,35 +10,33 @@
         
         // add event listener reacting when message is received
         mySocket.onmessage = function (event) {
-            var output = document.getElementById("output");
-            // put text into our output div
-            output.textContent = event.data;
+            $('#messages').append($('<li>').text(event.data));
         };
-        var form = document.getElementsByClassName("foo");
-        var input = document.getElementById("input");
-        form[0].addEventListener("submit", function (e) {
+        $('form').submit(function(){
             // on forms submission send input to our server
-            input_text = input.value;
+            input_text = $('#m').val();
             mySocket.send(input_text);
-            e.preventDefault()
+            $('#m').val('');
+            return false;
         })
     });
 </script>
-<style>
-    /* just some super basic css to make things bit more readable */
-    div {
-        margin: 10em;
-    }
-    form {
-        margin: 10em;
-    }
-</style>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
 </head>
 <body>
-    <form class="foo">
-        <input id="input"></input>
-        <input type="submit"></input>
+    <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.js"></script>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
     </form>
-    <div id="output"></div>
 </body>
 </html>
