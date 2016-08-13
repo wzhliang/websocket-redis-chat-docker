@@ -1,14 +1,11 @@
 version: '2'
 services:
-  putter:
-    build: ./putter1
+  server:
+    build: ./server
     environment:
       - REDIS_SRV=redis
-
-  getter:
-    build: ./getter
-    environment:
-      - REDIS_SRV=redis
+    ports:
+      - "7000:7000"
 
   redis:
     image: daocloud.io/redis:latest
