@@ -1,13 +1,26 @@
 version: '2'
 services:
-  server:
+
+  server1:
     build: ./server
+    links:
+      - redis
     environment:
-      - REDIS_SRV=redis
+      - REDIS_SVR=redis
     ports:
       - "7000:7000"
+
+  server2:
+    build: ./server
+    links:
+      - redis
+    environment:
+      - REDIS_SVR=redis
+    ports:
+      - "7001"
 
   redis:
     image: daocloud.io/redis:latest
     ports:
       - "6379"
+
