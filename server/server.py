@@ -3,7 +3,10 @@ from autobahn.asyncio.websocket import \
     WebSocketServerProtocol, WebSocketServerFactory
 
 import asyncio
+import redis
+import os
 
+_redis_ = os.getenv('REDIS_SVR') or 'localhost'
 
 class BroadcastServerProtocol(WebSocketServerProtocol):
 
@@ -18,11 +21,22 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
         WebSocketServerProtocol.connectionLost(self, reason)
         self.factory.unregister(self)
 
+    def tryRelayMessage(self):
+        if not hasattr(self, 'sub'):
+            self.red = redis.StrictRedis(host=_redis_)
+            self.sub = self.red.pubsub()
+            self.sub.subscribe('chat')
+        m = self.sub.get_message()
+        if m is not None and m['type'] == 'message':
+            print("Relaying %s" % m)
+            self.sendMessage(m['data'])
+
 
 class BroadcastServerFactory(WebSocketServerFactory):
 
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
+        self.red = redis.StrictRedis(host=_redis_)
         self.clients = []
 
     def register(self, client):
@@ -37,8 +51,9 @@ class BroadcastServerFactory(WebSocketServerFactory):
 
     def broadcast(self, msg, client):
         print("broadcasting message '{0}' ..".format(msg))
+        self.red.publish('chat', msg.encode('utf-8'))
         for c in self.clients:
-            c.sendMessage(msg.encode('utf-8'))
+            self.loop.call_soon(c.tryRelayMessage)
 
 
 if __name__ == '__main__':
@@ -48,6 +63,7 @@ if __name__ == '__main__':
 
     coro = loop.create_server(factory, '0.0.0.0', 7000)
     server = loop.run_until_complete(coro)
+    print("Serving running on 7000...")
 
     try:
         loop.run_forever()
