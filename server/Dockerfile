@@ -21,7 +21,7 @@ RUN mkdir /code
 ADD server.py /code
 
 WORKDIR /code
-RUN pip3 install autobahn redis
+RUN pip3 install autobahn asyncio_redis
 
 EXPOSE 7000
 

@@ -4,7 +4,6 @@ from autobahn.asyncio.websocket import \
 
 import asyncio
 import asyncio_redis
-import redis
 import os
 
 _redis_ = os.getenv('REDIS_SVR') or 'localhost'
