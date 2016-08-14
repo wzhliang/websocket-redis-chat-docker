@@ -17,9 +17,10 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
         self.factory.register(self)
         self.loop.create_task(self.relay_message())
 
-    def onMessage(self, payload, isBinary):
-        if not isBinary:
-            self.factory.broadcast(payload.decode('utf8'), self)
+    async def onMessage(self, payload, isBinary):
+        if isBinary:
+            return
+        await self.factory.broadcast(payload.decode('utf8'), self)
 
     def connectionLost(self, reason):
         WebSocketServerProtocol.connectionLost(self, reason)
@@ -38,7 +39,7 @@ class BroadcastServerFactory(WebSocketServerFactory):
 
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
-        self.red = redis.StrictRedis(host=_redis_)
+        self.red = None
         self.clients = []
 
     def register(self, client):
@@ -51,9 +52,11 @@ class BroadcastServerFactory(WebSocketServerFactory):
             print("unregistered client {0}".format(client.peer))
             self.clients.remove(client)
 
-    def broadcast(self, msg, client):
+    async def broadcast(self, msg, client):
+        if self.red is None:
+            self.red = await asyncio_redis.Connection.create(host=_redis_)
         print("broadcasting message '{0}' ..".format(msg))
-        self.red.publish('chat', msg.encode('utf-8'))
+        await self.red.protocol.publish('chat', msg)
 
 
 if __name__ == '__main__':
