@@ -8,9 +8,12 @@ import os
 
 _redis_ = os.getenv('REDIS_SVR') or 'localhost'
 
+
 class BroadcastServerProtocol(WebSocketServerProtocol):
     def __init__(self, *args, **kwargs):
         self.loop = asyncio.get_event_loop()
+        self.red = None
+        self.sub = None
 
     def onOpen(self):
         self.factory.register(self)
@@ -35,7 +38,6 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
 
 
 class BroadcastServerFactory(WebSocketServerFactory):
-
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self.red = None
