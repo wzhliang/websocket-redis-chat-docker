@@ -1,4 +1,4 @@
-FROM davidjfelix/python3.5
+FROM daocloud.io/library/python:3.5.0
 
 RUN apt-get update
 
